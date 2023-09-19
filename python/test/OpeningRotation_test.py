@@ -147,7 +147,7 @@ def get_data(date):
     query = f"""
                 SELECT ts as Time, underly, sprdsym as Spread, price as LastPrice, sprdtype
                 FROM trdsprd
-                WHERE ts >= DATE_SUB('{date}', INTERVAL 3 DAY)
+                WHERE ts >= DATE_SUB('{date}', INTERVAL 1 DAY)
                 AND DAYOFWEEK(ts) BETWEEN 2 AND 6
                 AND sprdtype in ('0', '5', '6')
                 AND underly NOT LIKE 'QQQ%%'
@@ -174,44 +174,6 @@ def get_batch_data2_from_batch_data1(df, batch_data_df_from_get_batch_data1, cur
         (batch_data_df_from_get_batch_data1['Timestamp'] >= target_time_914) &
         (batch_data_df_from_get_batch_data1['Timestamp'] <= target_time_915)
     ]
-
-    return batch_data_df
-
-@timing_decorator
-def get_batch_data2(df, current_date):
-    # Extract relevant parameters from the dataframe
-    symbols = df['underly'].unique()
-    
-    # Convert the current date string to a datetime.date object
-    current_date_obj = datetime.strptime(current_date, '%Y%m%d').date()
-    
-    # Calculate the target times
-    target_time_915 = datetime.combine(current_date_obj, pd.Timestamp("9:15:00").time())
-    target_time_914 = datetime.combine(current_date_obj, pd.Timestamp("9:14:00").time())
-    
-    # Convert symbols list to a format suitable for SQL IN clause
-    symbols_placeholder = ",".join(["%s"] * len(symbols))
-
-    # Construct the query
-    query = f"""
-                SELECT symbol, tradets, tradevolume, tradelast
-                FROM equity_trades_new
-                WHERE 
-                    symbol IN ({symbols_placeholder}) AND
-                    (tradets BETWEEN %s AND %s)
-            """
-    
-    cursor = connection.cursor()
-
-    # Execute the query using parameters
-    cursor.execute(query, (*symbols, target_time_914, target_time_915))
-    results = cursor.fetchall()
-
-    cursor.close()
-
-    # Convert results to a dataframe for easier manipulation
-    columns = ['Symbol', 'Timestamp', 'Volume', 'Last_Trade']
-    batch_data_df = pd.DataFrame(results, columns=columns)
 
     return batch_data_df
 
