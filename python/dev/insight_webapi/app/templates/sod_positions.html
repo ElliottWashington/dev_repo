@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <div>
+            <title>Insight (BETA)</title>
+        </div>
+        <style>
+            .header {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 5%;
+            }
+            body {
+            background-color: #b0f8b5;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 1em;
+            background: linear-gradient(180deg, #efffe7 0%, #baff97 64%, #91ff5a 100%);
+            background-attachment: fixed;
+            }
+            h1,
+            h2 {
+            color: #004d40;
+            /* dark green text color */
+            }
+            .form-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            }
+            table {
+            margin: 1em auto;
+            border-collapse: collapse;
+            }
+            th,
+            td {
+            border: 1px solid #004d40;
+            padding: 10px;
+            }
+            th {
+            background-color: #4caf50;
+            color: white;
+            }
+            button {
+            font-size: 1.2em;
+            /* increase font size */
+            padding: 10px 20px;
+            /* increase button size by adding padding */
+            margin: 0 10px;
+            /* add horizontal spacing between buttons */
+            background-color: #4caf50;
+            /* green button */
+            color: white;
+            /* white text */
+            border: none;
+            /* remove default button border */
+            border-radius: 5px;
+            /* rounded corners */
+            cursor: pointer;
+            /* change cursor to hand when hovering over button */
+            }
+            button:hover {
+            background-color: #072709;
+            /* darker green when hovering */
+            }
+            .back-btn {
+            background-color: #fc4949;
+            color: white;
+            border: none;
+            border-radius: 5px;;
+            }
+            .back-btn:hover {
+            background-color: #ff6868;
+            }
+            .svg-container {
+            height: 107.22px;
+            width: 400px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            }          
+            .plot_container {
+            display: flex;
+            justify-content: center;
+            }
+        </style>
+        <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.2.1.min.css">
+        <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.2.1.min.css">
+        <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.2.1.min.js"></script>
+        <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.2.1.min.js"></script>
+        <header>
+            <div class="header">
+                <button class="back-btn" onclick="window.location.href='/'">Home </button>
+                <div class="svg-container">
+                    <svg class="svg-container w-[min(100%,_15rem)] md:w-80" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" clip-rule="evenodd" viewBox="0 0 1981 525">
+                        <title>Scalp Trade</title>
+                        <path fill="url(#a)" d="M0 0h1113.9v524.6H0z"></path>
+                        <path fill="#1da40e" fill-rule="nonzero" d="M1194.9 368.4h23.4V187.2h61.5v-20h-146.4v20h61.5v181.2Zm118.1 0h23.8V282h38.4l50 86.4h27l-53.3-90.6v-1.5c24.9-7.8 39.3-24 39.3-52.8 0-36.3-22.2-56.4-66.6-56.4H1313v201.3Zm23.8-105v-76.2h33c30.9 0 43.2 11.7 43.2 36.6 0 26.1-11.4 39.6-43 39.6h-33.2Zm128.7 105h22.8l20.7-58.8h80.7l21.3 58.8h24.9l-73.5-201.3h-23.1l-73.8 201.3Zm83.4-169.5h.6l32.7 90.6h-66.3l33-90.6Zm117.3 169.5h60c65.4 0 94.8-36.9 94.8-100.2v-5.7c0-64.2-34-95.4-95.1-95.4h-59.7v201.3Zm23.7-20.4V187.5h33.6c46.2 0 71.7 19.2 71.7 75v9c0 53.7-21 76.5-68.4 76.5h-37Zm170.7 20.4h120.3v-20h-96.6v-73.6h73.8v-20h-73.8v-67.6h95.7v-20h-119.4v201.2Z"></path>
+                        <path fill="#fff" fill-rule="nonzero" d="M106.3 371.7V306h9.5c11 38 30.9 56.9 59.3 56.9 12.4 0 21.7-3.8 27.8-11.2A38.2 38.2 0 0 0 212 327c0-10.4-3.2-19-9.8-25.6-6.6-6.7-19.6-14.8-38.8-24.2-20.2-10-34.6-19.7-43.4-29.3a49.3 49.3 0 0 1-13.2-35 60 60 0 0 1 14.1-37.6c9.5-12 22.7-18 39.8-18 17.5 0 31.9 7.1 43.3 21.3 2.4-2.5 5.6-8.4 9.5-17.9h9v61.8h-9a84.2 84.2 0 0 0-19-38.2 42.8 42.8 0 0 0-33-16 32 32 0 0 0-23.7 9 30 30 0 0 0 1 43.7c6.5 6.6 19 14 37.3 22.3 27.7 12.5 44.6 24.7 50.8 36.6 6.2 12 9.3 23.6 9.3 34.7A56 56 0 0 1 219 357a60.4 60.4 0 0 1-43.4 16.4 66 66 0 0 1-49-22.7 55 55 0 0 0-10.8 21h-9.5ZM448 316.5h10.7c-11 38-38.8 56.9-83 56.9a98 98 0 0 1-72-29c-19.4-19.4-29.1-45-29.1-77 0-32.7 10.5-59.2 31.5-79.6 21-20.3 45.8-30.5 74.5-30.5 17.2 0 33 3.8 47.6 11.4 14.5 7.5 21.7 16.8 21.7 27.7 0 4-1.3 7.9-4 11.5a13.6 13.6 0 0 1-11.6 5.3c-10.8 0-17.4-6.2-19.8-18.8-2-9.4-5-16-9-19.7-4.3-3.8-12.5-5.7-24.7-5.7-21.8 0-38.2 7.6-49.2 22.7-11 15.2-16.5 38-16.5 68.4 0 31.4 6 56 17.7 73.7 11.8 17.8 29.7 26.6 53.6 26.6 32.2 0 52.8-14.6 61.5-43.9Zm246.6 12.2h9c-1.4 27.8-15 41.8-41 41.8-11 0-19.8-3-26.2-8.8a44 44 0 0 1-12.6-26.2 255 255 0 0 1-44.5 26.2 91.6 91.6 0 0 1-36 8.8c-13.6 0-25.2-4-35-11.8a37.7 37.7 0 0 1-14.6-31c0-16.7 8.2-31.4 24.5-44 16.4-12.4 39-24.6 67.8-36.5l37.8-15.4V222c0-13.8-.9-23.8-2.7-30a30.8 30.8 0 0 0-13.9-16.6 53.3 53.3 0 0 0-29.5-7.3c-24.4 0-38 8.1-40.8 24.4-2.6 16.6-9.4 24.9-20.5 24.9-10 0-14.9-4.7-14.9-14.2 0-9.3 6.6-19.2 19.8-29.9 13.2-10.6 33.7-16 61.5-16 20.7 0 36.7 3.3 48.1 9.8 11.4 6.5 19 14 22.6 22.2 3.6 8.3 5.5 21 5.5 38v80.9c0 18.9 1 31 2.9 36.4 2 5.4 6.2 8 12.7 8 10.7 0 17.4-8 20-23.9Zm-70.8-85.4L597.2 254c-42 17-63 38.6-63 64.5 0 10.2 2.7 18.5 8 24.7a26.3 26.3 0 0 0 21 9.4c7.7 0 16.6-2.5 26.7-7.5a195 195 0 0 0 34-22.7v-79.1ZM789.4 29.6v267.1c0 21.4.3 34.8.9 40.3a17 17 0 0 0 7 12.7c4 3 11.3 4.4 21.7 4.4h5.8v11.2H718v-11.2h6.8c9.8 0 16.8-1.3 21-4a17 17 0 0 0 7.4-11.4 392 392 0 0 0 1.2-42V99c0-21-1.9-34.2-5.6-39.7-3.8-5.5-12.9-8.2-27.4-8.2V40c10 0 21.6-1.1 35-3.4 13.5-2.3 22.7-4.6 27.8-6.9h5.3Zm109 127.7h6.6c2.8 9.1 4.2 20.1 4.2 33 10.4-11 21.6-19.3 33.5-24.8 12-5.4 24.6-8.2 38-8.2 27.7 0 50.7 9.7 69 29.2 18.5 19.4 27.7 45.1 27.7 77 0 31.3-9.3 57.4-27.7 78.4a92.4 92.4 0 0 1-73 31.5 87.5 87.5 0 0 1-35.4-7.5c-11.3-5-22-12.3-32.1-22v75.9c0 23 .4 37.2 1.3 42.2s3.5 8.8 7.7 11.4a51 51 0 0 0 23.7 3.7v11.3H837.4V477h7.3c11.6 0 19-1.6 22.6-5 3.5-3.3 5.5-7.3 6-12 .7-4.6 1-18 1-40.3V238c0-21.3-.3-34.7-1-40.2a17 17 0 0 0-6.9-12.7c-4-3-11.3-4.4-21.7-4.4h-7.3v-11.3c16.1-1.6 36.4-5.7 61-12.2Zm10.8 170.4a98.2 98.2 0 0 0 28 24.3 62 62 0 0 0 79.2-15.5c13.6-15.8 20.4-41 20.4-75.4 0-30-6.5-52.3-19.7-67.2a61 61 0 0 0-47.1-22.2 64 64 0 0 0-32 8.6 99.5 99.5 0 0 0-28.8 25.9v121.5Z"></path>
+                        <defs>
+                            <radialGradient id="a" cx="0" cy="0" r="1" gradientTransform="matrix(448.43 -2.62 3.07 382.22 557 262.3)" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#55d541"></stop>
+                                <stop offset="1" stop-color="#1da40e"></stop>
+                            </radialGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </header>
+    </head>
+    <body>
+        <h1>SOD Position Data</h1>
+        <form method="POST" class="form-container">
+            <div>
+                <label for="sod_date">SOD Date:</label>
+                <input type="date" id="sod_date" name="sod_date" required>
+            </div>
+            <div>
+                <label for="symbol">Symbol:</label>
+                <input type="text" id="symbol" name="symbol">
+            </div>
+            <div>
+                <label for="account_number">Account:</label>
+                <select name="account_number">
+                    <option value="all">All</option>
+                    {% for account in accounts %}
+                    <option value="{{ account }}">{{ account }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="submit" value="Get Data">
+        </form>
+        {% if results %}
+        <table>
+            <thead>
+                <tr>
+                    <th>SOD Date</th>
+                    <th>Average Cost</th>
+                    <th>Symbol</th>
+                    <th>Quantity</th>
+                    <th>Account Number</th>
+                    <th>Clearing Account Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{result.sod_date}}</td>
+                    <td>{{result.average_cost}}</td>
+                    <td>{{result.symbol}}</td>
+                    <td>{{result.quantity}}</td>
+                    <td>{{result.account_number}}</td>
+                    <td>{{result.clearing_account_number}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        <script>
+            // Create a new Date object
+            var today = new Date();
+            
+            // Get the parts of the date
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+            
+            // Format the date
+            today = yyyy + '-' + mm + '-' + dd;
+            
+            // Set the value of the date input to the formatted date
+            document.getElementById('sod_date').value = today;
+        </script>
+    </body>
+</html>

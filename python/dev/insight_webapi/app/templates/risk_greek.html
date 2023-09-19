@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <div>
+        <title>Insight (BETA)</title>
+    </div>
+    <style>
+        .header {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 5%;
+        }
+        body {
+            background-color: #b0f8b5;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 1em;
+            background: linear-gradient(180deg, #efffe7 0%, #baff97 64%, #91ff5a 100%);
+            background-attachment: fixed;
+        }
+
+        h1,
+        h2 {
+            color: #004d40;
+            /* dark green text color */
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            margin: 1em auto;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #004d40;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        button {
+            font-size: 1.2em;
+            /* increase font size */
+            padding: 10px 20px;
+            /* increase button size by adding padding */
+            margin: 0 10px;
+            /* add horizontal spacing between buttons */
+            background-color: #4caf50;
+            /* green button */
+            color: white;
+            /* white text */
+            border: none;
+            /* remove default button border */
+            border-radius: 5px;
+            /* rounded corners */
+            cursor: pointer;
+            /* change cursor to hand when hovering over button */
+        }
+
+        button:hover {
+            background-color: #072709;
+            /* darker green when hovering */
+        }
+
+        .back-btn {
+            background-color: #fc4949;
+            color: white;
+            border: none;
+            border-radius: 5px;;
+        }
+
+        .back-btn:hover {
+            background-color: #ff6868;
+        }
+        .svg-container {
+            height: 107.22px;
+            width: 400px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }          
+        .plot_container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.2.1.min.css">
+    <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.2.1.min.css">
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.2.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.2.1.min.js"></script>
+</head>
+
+<body>
+    <h1>Risk Greek Data</h1>
+    <form method="POST" class="form-container">
+        <div class="form-field">
+            <label for="timestamp">Date:</label>
+            <input type="date" id="timestamp" name="timestamp">
+        </div>
+        <div class="form-field">
+            <label for="symbol">Symbol:</label>
+            <input type="text" id="symbol" name="symbol" placeholder="AMZN or IBP20231215C195">
+        </div>
+        <div class="form-field">
+            <label for="account">Account:</label>
+            <select name="account" id="account">
+                <option value="all">All</option>
+                {% for account in accounts %}
+                  <option value="{{ account }}">{{ account }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <input type="submit" value="Get Data">
+    </form>
+    {% if results %}
+    <h2>Data:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Account</th>
+                <th>Symbol</th>
+                <th>Pos</th>
+                <th>Option Price</th>
+                <th>Underlying Price</th>
+                <th>Volatility</th>
+                <th>Theo</th>
+                <th>Delta</th>
+                <th>Gamma</th>
+                <th>Vega</th>
+                <th>Theta</th>
+                <th>Rho</th>
+                <th>Theo Position</th>
+                <th>Delta Position</th>
+                <th>Gamma Position</th>
+                <th>Vega Position</th>
+                <th>Theta Position</th>
+                <th>Rho Position</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.timestamp }}</td>
+                <td>{{ result.account }}</td>
+                <td>{{ result.symbol }}</td>
+                <td>{{ result.pos }}</td>
+                <td>{{ result.optionprice }}</td>
+                <td>{{ result.underlyingprice }}</td>
+                <td>{{ result.volatility }}</td>
+                <td>{{ result.theo }}</td>
+                <td>{{ result.delta }}</td>
+                <td>{{ result.gamma }}</td>
+                <td>{{ result.vega }}</td>
+                <td>{{ result.theta }}</td>
+                <td>{{ result.rho }}</td>
+                <td>{{ result.Theo_Position }}</td>
+                <td>{{ result.Delta_Position }}</td>
+                <td>{{ result.Gamma_Position }}</td>
+                <td>{{ result.Vega_Position }}</td>
+                <td>{{ result.Theta_Position }}</td>
+                <td>{{ result.Rho_Position }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</body>
+
+</html>

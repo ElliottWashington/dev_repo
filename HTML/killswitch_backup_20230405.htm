@@ -1,0 +1,574 @@
+<html>
+	<head>
+		<title>
+			Killswitch
+		</title>
+		<style>
+			.fancybox {
+				margin:0 auto;    
+				border-radius: 25px;
+				background: #202020;
+				padding: 20px;
+				width: 85%;
+			}
+			.td_divider {
+				width: 0px;
+				margin: 0;
+				padding: 2;
+				border-top: 0;
+				border-left: 0;
+				border-right: 0;
+			}
+
+			.dot {
+				height: 25px;
+				width: 25px;
+				background-color: #bbb;
+				border-radius: 50%;
+				display: inline-block;
+			}
+			
+			html {
+				
+			}
+			body {
+				background-color: #000000;
+				color: #FFFFFF;
+			}
+			table {
+				border-collapse: collapse; 
+				
+			}
+			table td {
+				text-align: center;
+				width: 70px;
+				padding: 5px;
+				border: 1px solid #FFFFFF;
+				white-space: nowrap;
+			}
+			table th {
+				text-align: center;
+				width: 70px;
+				padding: 5px;
+				border: 1px solid #FFFFFF;
+				white-space: nowrap;
+			}
+			
+			a {
+				color: #FFF;
+				visited: #FFF;
+			}
+			
+			@keyframes pulse {
+				0% {
+					color: #FFF;
+				}
+				50% {
+					color: #444;
+				}
+				100% {
+					color: #FFF;
+				}
+			}
+			
+			.pulse_target {
+				animation: pulse .3s;
+			}
+			
+		</style>
+		<!-- Utilities -->
+		<script>
+			function $(id)
+			{
+				return document.getElementById(id);
+			}
+			
+			function ajax_no_cache(url)
+			{
+				return url.concat(/\?/.test(url) ? "&" : "?",
+				                  "noCache=",
+				                  (new Date).getTime(), ".",
+				                  Math.random() * 1234567);
+			}
+			
+			function ajax_get_request(url, callback)
+			{
+				var url = ajax_no_cache(url);
+				
+				// Create AJAX request handler object
+				var request = new XMLHttpRequest();
+				
+				// Request handler callback function
+				request.onreadystatechange = function() {
+					if (request.readyState === XMLHttpRequest.DONE) {
+						var status;
+						
+						if (request.status == 0
+						 || request.status == 200) {
+							status = true;
+						}
+						else {
+							status = false;
+						}
+						
+						callback(status, request);
+					}
+				}
+				
+				//Send Request
+				request.open("GET", url, true);
+				request.send(null);
+			}
+			
+			function convert_tz(date, tzString)
+			{
+				var tmp;
+				
+				if (typeof date === "string") {
+					tmp = new Date(date);
+				}
+				else {
+					tmp = date;
+				}
+				
+				var str = tmp.toLocaleString("en-US", {timeZone: tzString});
+				
+				return new Date(str);
+			}
+			
+			function enforce_min_max(elem)
+			{
+				if (elem.value != "") {
+					if (parseInt(elem.value) < parseInt(elem.min)) {
+						elem.value = elem.min;
+					}
+					else if (parseInt(elem.value) > parseInt(elem.max)) {
+						elem.value = elem.max;
+					}
+				}
+			}
+			
+			function add_enter_handler(src, target)
+			{
+				src.addEventListener("keyup", function(event) {
+				  if (event.keyCode === 13) {
+					event.preventDefault();
+					target.click();
+				  }
+				});
+			}
+			
+			function pulser(elem)
+			{
+				if (window.pulser_debounce == true) {
+					return;
+				}
+				
+				window.pulser_debounce = true;
+				elem.classList.add("pulse_target");
+				
+				setTimeout(function() {
+					elem.classList.remove("pulse_target");
+					window.pulser_debounce = false;
+				}, 300);
+			}
+		</script>
+		<!-- Static JSON data handling -->
+		<script>
+			function add_refresh_button(ip, data, cell)
+			{
+				var refresh_button = document.createElement('input');
+				refresh_button.setAttribute('type', 'button');
+				refresh_button.setAttribute('value', 'Refresh');
+
+				if(!data.hasOwnProperty('config'))
+				{
+					refresh_button.setAttribute('onclick', 'get_opm_status(\'' + ip + '\',\'' + data.application + '\')');
+				}
+				else 
+				{
+					refresh_button.setAttribute('onclick', 'get_or_status(\'' + ip + '\',\'' + data.application + '\',\'' + data.config + '\')');
+				}
+
+				cell.appendChild(refresh_button);
+			}
+			
+			function add_start_button(ip, data, cell)
+			{
+				var start_button = document.createElement('input');
+				start_button.setAttribute('type', 'button');
+				start_button.setAttribute('value', 'Start');
+
+				if(!data.hasOwnProperty('config'))
+				{
+					start_button.setAttribute('onclick', 'startup_opm(\'' + ip + '\',\'' + data.startup + '\',\'' + data.log + '\', \'' + data.application + '\')');
+				}
+				else 
+				{
+					start_button.setAttribute('onclick', 'startup_or(\'' + ip + '\',\'' + data.startup + '\',\'' + data.log + '\', \'' + 
+						data.application  + '\', \'' + data.config + '\')');
+				}
+
+				cell.appendChild(start_button);
+			}
+
+			function add_stop_button(ip, data, cell)
+			{
+                                var stop_button = document.createElement('input');
+                                stop_button.setAttribute('type', 'button');
+                                stop_button.setAttribute('value','Stop');
+
+                                if(!data.hasOwnProperty('config'))
+                                {
+                                        stop_button.setAttribute('onclick', 'stop_opm(\'' + ip + '\',\'' + data.application + '\')');
+                                }
+                                else
+                                {
+                                        stop_button.setAttribute('onclick', 'stop_or(\'' + ip + '\',\'' + data.application + '\',\'' + data.config + '\')');
+                                }
+
+                                cell.appendChild(stop_button);
+			}
+
+			function add_kill_button(ip, data, cell)
+			{
+				var kill_button = document.createElement('input');
+				kill_button.setAttribute('type', 'button');
+				kill_button.setAttribute('value','Kill');
+				
+				if(!data.hasOwnProperty('config'))
+				{
+					kill_button.setAttribute('onclick', 'kill_opm(\'' + ip + '\',\'' + data.application + '\')');
+				}
+				else 
+				{
+					kill_button.setAttribute('onclick', 'kill_or(\'' + ip + '\',\'' + data.application + '\',\'' + data.config + '\')');
+				}
+				
+				cell.appendChild(kill_button);
+			}
+
+			function add_restart_button(ip, data, cell)
+			{
+				var restart_button = document.createElement('input');
+				restart_button.disabled = true;
+				restart_button.setAttribute('type', 'button');
+				restart_button.setAttribute('value', 'Restart');
+				
+				if(!data.hasOwnProperty('config'))
+				{
+					restart_button.setAttribute('onclick', 'kill_opm(\'' + ip + '\',\'' + data.application + '\'); ' + 
+						'startup_opm(\'' + ip + '\',\'' + data.startup + '\',\'' + data.log + '\', \'' + data.application + '\')');
+				}
+				else 
+				{
+					restart_button.setAttribute('onclick', 'kill_or(\'' + ip + '\',\'' + data.application + '\',\'' + data.config + '\'); ' +
+						'startup_or(\'' + ip + '\',\'' + data.startup + '\',\'' + data.log + '\', \'' + data.application  + '\', \'' + data.config + '\')');
+				}
+				cell.appendChild(restart_button);
+			}
+
+			function add_row(ip, data, table_body)
+			{
+				var row = document.createElement('tr');
+
+				var status_cell = document.createElement('td');
+
+				if(!data.hasOwnProperty('config'))
+				{
+					status_cell.id = 'status_' + get_opm_id(ip, data.application);
+				}
+				else 
+				{
+					status_cell.id = 'status_' + get_or_id(ip, data.application, data.config);
+				}
+
+				status_cell.innerHTML = "Unknown State";
+				row.appendChild(status_cell);
+
+				var refresh_button_cell = document.createElement('td');
+				add_refresh_button(ip, data, refresh_button_cell);
+				row.appendChild(refresh_button_cell);
+
+				var start_button_cell = document.createElement('td');
+				add_start_button(ip, data, start_button_cell);
+				row.appendChild(start_button_cell);
+
+                                var stop_button_cell = document.createElement('td');
+                                add_stop_button(ip, data, stop_button_cell);
+                                row.appendChild(stop_button_cell);
+
+				var kill_button_cell = document.createElement('td');
+				add_kill_button(ip, data, kill_button_cell);
+				row.appendChild(kill_button_cell);
+
+				var restart_button_cell = document.createElement('td');
+				add_restart_button(ip, data, restart_button_cell);
+				row.appendChild(restart_button_cell);
+
+				var alias_cell = document.createElement('td');
+				alias_cell.innerHTML = data.alias;
+				row.appendChild(alias_cell);
+
+				var info_cell = document.createElement('td');
+				info_cell.innerHTML = data.info;
+				row.appendChild(info_cell);
+
+				table_body.appendChild(row);
+			}			
+
+			function add_opm_or_group(ip, opm_or_group, table_body)
+			{
+				add_row(ip, opm_or_group, table_body);
+
+				opm_or_group.ors.forEach(function(or) {
+					add_row(ip, or, table_body);
+				});
+			}
+			
+			function add_server(server)
+			{
+				var server_div = document.createElement('div');
+				server_div.id = "server_" +  server.ip.replace(/\./g,'_');
+				server_div.classList.add('fancybox');
+
+				var server_header = document.createElement('center');
+				var server_name = document.createElement('h1');
+				server_name.innerHTML = server.ip + ' - ' + server.info;
+
+				var server_table = document.createElement('table');
+				server_table.id = "table_" + server.ip.replace(/\./g,'_');
+				server_table.setAttribute("align", "center");
+
+				var server_table_body = document.createElement('tbody');
+				var server_table_headers = document.createElement('tr');
+
+				var server_table_header_status = document.createElement('th');
+				server_table_header_status.innerHTML = "Status";
+				server_table_headers.appendChild(server_table_header_status);
+
+				var server_table_header_procedures = document.createElement('th');
+				server_table_header_procedures.innerHTML = "Procedures";
+				server_table_header_procedures.setAttribute('colspan', 5);
+				server_table_headers.appendChild(server_table_header_procedures);
+
+				var server_table_header_alias = document.createElement('th');
+				server_table_header_alias.innerHTML = "Alias";
+				server_table_headers.appendChild(server_table_header_alias);
+
+				var server_table_header_info = document.createElement('th');
+				server_table_header_info.innerHTML = "Info";
+				server_table_headers.appendChild(server_table_header_info);
+
+				server_table_body.appendChild(server_table_headers);
+				server_table.appendChild(server_table_body);
+
+				server.opms.forEach(function(opm) {
+					add_opm_or_group(server.ip, opm, server_table_body);
+					var padding = document.createElement('tr');
+					var empty_data = document.createElement('td');
+					empty_data.setAttribute('colspan', 7);
+					padding.appendChild(empty_data);
+					server_table_body.appendChild(padding);
+				});
+
+				server_header.appendChild(server_name);
+				server_div.appendChild(server_header);
+				server_div.appendChild(server_table);
+				document.body.appendChild(server_div);
+			}
+			
+			function process_server_list(success, request)
+			{
+				window.server_request = request;
+				
+				if (!success) {
+					window.server_list = null;
+					
+					alert("Error: Unable to read server list: " +
+					      "HTTP status:" + request.status);
+				}
+				else {
+					window.server_list = JSON.parse(request.responseText);
+					
+					window.server_list.servers.forEach(function(server) {
+						add_server(server);
+					});
+
+					window.time = 60;
+					$("timer").innerHTML = window.time + " SECONDS TILL REFRESH";
+
+					setInterval(function() {
+						window.time -= 1;
+						if(window.time <= 0) {
+							refresh_stats();
+							window.time = 60;
+						}
+						$("timer").innerHTML = window.time + " SECONDS TILL REFRESH";
+					}, 1000);
+
+					refresh_stats();
+				}
+			}
+			
+			function get_server_list()
+			{
+				window.server_list_loaded = false;
+				
+				ajax_get_request("/json/killswitch/servers.json",
+				                 process_server_list);
+			}
+		</script>
+		<!-- Helpers -->
+		<script>
+		function get_opm_id(ip, application)
+		{
+			return ip.replaceAll('.', '_') + application.replaceAll('/', '_');
+		}
+
+		function get_or_id(ip, application, configuration)
+		{
+			return ip.replaceAll('.', '_') + application.replaceAll('/', '_') + "_" + configuration;
+		}
+		</script>
+		<!-- Controls -->
+		<script>
+			function get_opm_status(ip, application)
+			{
+				var id = 'status_' + get_opm_id(ip, application);
+				ajax_get_request("cgi-bin/getstats.cgi?ip=" + ip +
+					"&app=" + encodeURIComponent(application),
+					function(status, request) {
+						process_status(status, request, id);
+					});
+			}
+
+			function get_or_status(ip, application, configuration)
+			{
+				var id = 'status_' + get_or_id(ip, application, configuration);
+				ajax_get_request("cgi-bin/getstats.cgi?ip=" + ip +
+					"&app=" + encodeURIComponent(application) + 
+					"&config=" + encodeURIComponent(configuration),
+					function(status, request) { 
+						process_status(status, request, id);
+					});
+			}
+
+			function process_status(status, request, id)
+			{
+				if(!status) {
+					$(id).innerHTML = "ERROR: Could not query server";
+				} 
+				else {
+					if(request.responseText.trim()){
+						$(id).innerHTML = request.responseText;	
+					} 
+					else {
+						$(id).innerHTML = "Offline";
+					}
+					
+				}
+			}
+
+			function startup_opm(ip, startup, log, application)
+			{
+				ajax_get_request("cgi-bin/startup.cgi?ip=" + ip +
+					"&app=" + encodeURIComponent(startup) +
+					"&log=" + encodeURIComponent(log),
+					function(status, request) {
+						get_opm_status(ip, application);
+					});
+			}
+
+			function startup_or(ip, startup, log, application, configuration)
+			{
+				ajax_get_request("cgi-bin/startup.cgi?ip=" + ip + 
+					"&app=" + encodeURIComponent(startup) + 
+					"&log=" + encodeURIComponent(log),
+					function(status, request) {
+						get_or_status(ip, application, configuration);
+					});
+			}
+
+                        function stop_opm(ip, application)
+                        {
+                                if(window.confirm("Are you sure you want to stop this?"))
+                                {
+                                        ajax_get_request("/cgi-bin/interrupt.cgi?ip=" + ip +
+                                                "&app=" + encodeURIComponent(application),
+                                                function (status, request) {
+                                                        get_opm_status(ip, application);
+                                                });
+                                }
+                        }
+
+                        function stop_or(ip, application, configuration)
+                        {
+                                if(window.confirm("Are you sure you want to stop this?"))
+                                {
+                                        ajax_get_request("/cgi-bin/interrupt.cgi?ip=" + ip +
+                                                "&app=" + encodeURIComponent(application) +
+                                                "&config=" + encodeURIComponent(configuration),
+                                                function (status, request) {
+                                                        get_or_status(ip, application, configuration);
+                                                });
+                                }
+                        }
+			
+			function kill_opm(ip, application) 
+			{
+				if(window.confirm("Are you sure you want to kill this?"))
+				{
+					ajax_get_request("/cgi-bin/kill.cgi?ip=" + ip +
+						"&app=" + encodeURIComponent(application),
+						function (status, request) {
+							get_opm_status(ip, application);
+						});
+				}
+			}
+
+			function kill_or(ip, application, configuration)
+			{
+				if(window.confirm("Are you sure you want to kill this?"))
+				{
+					ajax_get_request("/cgi-bin/kill.cgi?ip=" + ip + 
+						"&app=" + encodeURIComponent(application) + 
+						"&config=" + encodeURIComponent(configuration),
+						function (status, request) { 
+							get_or_status(ip, application, configuration);
+						});
+				}
+			}
+
+			function refresh_stats()
+			{
+				window.server_list.servers.forEach(function(server) {
+					server.opms.forEach(function(opm) {
+						get_opm_status(server.ip, opm.application);
+						opm.ors.forEach(function(or) { 
+							get_or_status(server.ip, or.application, or.config);
+						});
+					});
+				});
+			}
+		</script>
+		<!-- main() -->
+		<script>
+			window.onload = function() {
+				get_server_list();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="timer"
+		     class="fancybox"
+		     style="text-align: center;"
+		     onclick="event.preventDefault(); $('execute').focus();">
+		</div>
+		<div
+		    class="fancybox"
+		    style="text-align: center;">
+			<a href="/protocols.htm">Protocols and Contact Info</a>
+		</div>
+	</body>
+</html>

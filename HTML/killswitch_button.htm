@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Send Email Button</title>
+</head>
+<body>
+	<button onclick="sendEmail()">Send Email</button>
+
+	<script>
+		function sendEmail() {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "/send_email", true);
+			xhr.send();
+		}
+	</script>
+</body>
+</html>

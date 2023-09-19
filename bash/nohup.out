@@ -1,0 +1,6 @@
+tail: /home/elliott/Development/files/orvolant_20230622.log: file truncated
+tail: /home/elliott/Development/files/orvolant_20230622.log: file truncated
+tail: /home/elliott/Development/files/orinet_20230622.log: file truncated
+tail: '/home/elliott/Development/files/ordash_20230622.log' has become inaccessible: No such file or directory
+tail: '/home/elliott/Development/files/orinet_20230622.log' has become inaccessible: No such file or directory
+tail: '/home/elliott/Development/files/orvolant_20230622.log' has become inaccessible: No such file or directory
