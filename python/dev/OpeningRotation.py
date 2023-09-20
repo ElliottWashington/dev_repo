@@ -141,7 +141,7 @@ def identify_option_type(row):
     return row['sprdtype']
 
 def get_data_parallel(date):
-    with ThreadPoolExecutor(max_workers=16) as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         results = list(executor.map(get_data, date))
     return pd.concat(results, ignore_index=True)
 
@@ -289,7 +289,7 @@ def assign_closest_prices_parallel(original_df, batch_data_df):
     result_df = pd.DataFrame()
 
     # Create a ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=16) as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         futures = {executor.submit(process_symbol, original_df, batch_data_df, symbol): symbol for symbol in original_df['underly'].unique()}
 
         for future in concurrent.futures.as_completed(futures):
@@ -348,7 +348,7 @@ def round_to_two_decimals(df, columns):
 @timing_decorator
 def generate_and_execute_sql_parallel(result_df):
     unique_underly_values = result_df['underly'].unique()
-    with ThreadPoolExecutor(max_workers=16) as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         results = list(executor.map(generate_and_execute_sql, [result_df[result_df['underly'] == symbol] for symbol in unique_underly_values]))
     return {k: v for d in results for k, v in d.items()}
 
@@ -570,7 +570,7 @@ def zip_and_send(date):
 
     #Send the zip archive via email
     send_email(['ewashington@scalptrade.com', 'sleland@scalptrade.com', 'aiacullo@scalptrade.com', 'jfeng@scalptrade.com', 'jthakkar@scalptrade.com ', 'jwood@scalptrade.com'], 
-            'Open Rotation Watchlist - Test', 
+            'Open Rotation Watchlist', 
             attachment_path=zip_filename)
 
 def send_email(names, subject, attachment_path):
@@ -632,8 +632,6 @@ def main():
     filter_and_save(result_df, date)
 
     zip_and_send(date)
-
-    #new change
 
 if __name__ == "__main__":
     main()
